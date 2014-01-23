@@ -1,8 +1,8 @@
 Web Scanner
 ===========
 
-Web Scanner is an easy script, which reads and parses certain web page.
-It returns desired part of the web page, which is saved as an HTML file.
+Web Scanner is a simple script, which reads and parses certain web page.
+It returns desired part of the web page, which is saved as a HTML file.
 It is useful for keeping web page history (e.g. Google Play app review stats).
 
 Web Scanner utility is supposed to run on the server. It saves HTML file
@@ -17,39 +17,37 @@ for example to Google Doc.
 Usage
 =====
 
-Web Scanner is a console application (must be run in the command line)
-and is written in Python 2.7. To run it, you must have installed Python
-interpreter, which can be downloaded at: www.python.org.
+Web Scanner is a console application and is written in Python 2.7. To run it,
+you must have installed Python interpreter, which can be downloaded
+at www.python.org.
 
-* nohup python webscanner.py & - run webscanner script on the server
-* python summarize.py - run summarize script
+```bash
+$ nohup python webscanner.py &    # run webscanner script on the server
+$ python summarize.py             # run summarize script
+```
 
 
 Developed by
 ============
 
 * [Petr Nohejl](http://petrnohejl.cz)
-* [Martin Skala](http://sanero.cz)
+* Martin Skala
 
 
 License
 =======
 
-    Copyright (C) 2012 Petr Nohejl, petrnohejl.cz
-    Copyright (C) 2012 Martin Skala, sanero.cz
+    Copyright 2012 Petr Nohejl
+    Copyright 2012 Martin Skala
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
-    
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-    GNU General Public License for more details.
-    
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-    
-    This program comes with ABSOLUTELY NO WARRANTY!
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
