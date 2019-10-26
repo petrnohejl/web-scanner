@@ -113,11 +113,11 @@ class App():
 			for i in range(len(urls)):
 				url = urls[i]
 
-				if(self.__validate_url(url)==False):
+				if(self.sa.validate_url(url)==False):
 					invalid_url_counter += 1
 					continue
 
-				filename = self.sa.process_article(url, ticker)
+				filename = self.sa.process_article_from_url(url, ticker)
 
 				if(filename!=None):
 					print "Downloaded: " + filename
@@ -159,7 +159,13 @@ class App():
 			webbrowser.open(path, new=2)
 
 
-	def __validate_url(self, url):
+class SeekingA():
+	def __init__(self):
+		self.cookie_jar = None
+		self.session = requests.session()
+
+
+	def validate_url(self, url):
 		regex = re.compile(
 			r'^(?:http|ftp)s?://' # http:// or https://
 			r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
@@ -170,16 +176,34 @@ class App():
 		return re.match(regex, url) is not None
 
 
-class SeekingA():
-	def __init__(self):
-		self.cookie_jar = None
-		self.session = requests.session()
+	def process_directory(self, directory):
+		try:
+			files = os.listdir(directory)
+			for file in files:
+				filename = os.path.join(directory, file)
+				self.process_article_from_file(filename, directory)
+		except:
+			print "Error: processing directory failed"
 
 
-	def process_article(self, url, ticker=None):
+	def process_article_from_file(self, filename, ticker=None):
+		# get file content
+		content = self.__load_content_from_file(filename)
+		
+		# get url
+		url = re.compile(self.__transform_sa(r"\<link href=\"https:\/\/seekingA.com.+?rel=\"amphtml\""), re.MULTILINE|re.DOTALL).findall(content)
+		url = url[0][12:-15]
+
+		return self.__process_article(content, url, ticker)
+
+
+	def process_article_from_url(self, url, ticker=None):
 		# get web content
 		content = self.__load_content_from_url(url)
-		
+		return self.__process_article(content, url, ticker)
+
+
+	def __process_article(self, content, url, ticker=None):
 		# parse content
 		article = re.compile(r"\<article\>.+?\<\/article\>", re.MULTILINE|re.DOTALL).findall(content)
 		title = re.compile(r"\<title\>.+?\<\/title\>", re.MULTILINE|re.DOTALL).findall(content)
@@ -203,9 +227,19 @@ class SeekingA():
 			return None
 
 
+	def __load_content_from_file(self, filename):
+		content = ""
+		with open(filename, "r") as file:
+			content = file.read()
+			print "Read " + filename
+			file.close
+		return content.decode('utf-8')
+
+
 	def __load_content_from_url(self, url):
 		headers = {"User-Agent": USER_AGENT, "cache-control": "no-cache", "Accept": "*/*", "accept-encoding": "gzip, deflate"}
 		call = self.session.get(url, headers=headers, cookies=self.cookie_jar, allow_redirects=True)
+		#call = self.session.get(url, headers=headers, cookies=self.cookie_jar, proxies={"http": "http://95.88.12.230:3128"}) # https://free-proxy-list.net/
 		print str(call.status_code) + " " + call.reason + ": " + call.url
 		#self.__print_call(call)
 		
@@ -244,7 +278,7 @@ class SeekingA():
 		file = open(filename, "w")
 		file.write("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n")
 		file.write(title.encode('utf-8') + "\n")
-		file.write("<style type='text/css' media='all'>article{width:640px;margin:auto;} #author-hd .info div.actions{width:550px}</style>\n")
+		file.write("<style type='text/css' media='all'>body{padding:20px 0 20px 0 !important} article{width:640px;margin:auto;} #author-hd .info div.actions{width:550px}</style>\n")
 		file.write(style.encode('utf-8') + "\n")
 		file.write("</head><body>\n")
 		file.write(content.encode('utf-8') + "\n")
@@ -260,8 +294,11 @@ if (__name__=="__main__"):
 	if(len(sys.argv)==1):
 		App().run()
 	elif(len(sys.argv)==2):
-		url = sys.argv[1]
+		arg = sys.argv[1]
 		sa = SeekingA()
-		sa.process_article(url)
+		if(sa.validate_url(arg)==True):
+			sa.process_article_from_url(arg)
+		else:
+			sa.process_directory(arg)
 	else:
 		print "Error: invalid arguments"
